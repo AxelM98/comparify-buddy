@@ -26,11 +26,11 @@ interface MainProduct {
   price: number;
   sku?: string;
   description?: string;
+  similarProducts: EbayProduct[];
 }
 
 interface ComparisonData {
-  mainProduct: MainProduct;
-  similarProducts: EbayProduct[];
+  products: MainProduct[];
   timestamp: string;
 }
 
@@ -39,7 +39,8 @@ const Results = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState<ComparisonData | null>(null);
-  const [comparisonMetrics, setComparisonMetrics] = useState<any>(null);
+  const [activeProductIndex, setActiveProductIndex] = useState(0);
+  const [comparisonMetrics, setComparisonMetrics] = useState<any[]>([]);
 
   useEffect(() => {
     // Get data from sessionStorage
@@ -56,10 +57,12 @@ const Results = () => {
       const parsedData = JSON.parse(storedData) as ComparisonData;
       setData(parsedData);
       
-      // Calculate pricing recommendation
-      const metrics = calculatePricingRecommendation(
-        parsedData.similarProducts,
-        parsedData.mainProduct.price
+      // Calculate pricing recommendation for each product
+      const metrics = parsedData.products.map(product => 
+        calculatePricingRecommendation(
+          product.similarProducts,
+          product.price
+        )
       );
       setComparisonMetrics(metrics);
       
@@ -83,7 +86,7 @@ const Results = () => {
     );
   }
 
-  if (!data) {
+  if (!data || !data.products || data.products.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -94,7 +97,8 @@ const Results = () => {
     );
   }
 
-  const { mainProduct, similarProducts } = data;
+  const activeProduct = data.products[activeProductIndex];
+  const { similarProducts } = activeProduct;
 
   const handleSaveComparison = () => {
     // In a real app, this would save to a database
@@ -103,7 +107,7 @@ const Results = () => {
     
     // Check if already saved
     const alreadySaved = savedComparisons.some(
-      (comp: any) => comp.mainProduct.id === mainProduct.id &&
+      (comp: any) => comp.products.some((p: any) => p.id === data.products[0].id) &&
                     comp.timestamp === data.timestamp
     );
     
@@ -185,18 +189,41 @@ const Results = () => {
             </div>
           </div>
 
+          {/* Product selector for multiple products */}
+          {data.products.length > 1 && (
+            <div className="mb-6">
+              <h2 className="text-lg font-medium mb-3">Your Products</h2>
+              <div className="flex overflow-x-auto gap-4 pb-2">
+                {data.products.map((product, index) => (
+                  <div 
+                    key={product.id}
+                    onClick={() => setActiveProductIndex(index)}
+                    className={`cursor-pointer rounded-lg p-3 min-w-[180px] transition-all ${
+                      index === activeProductIndex 
+                      ? 'bg-primary/10 border border-primary/30' 
+                      : 'bg-secondary/30 border border-border hover:bg-secondary/50'
+                    }`}
+                  >
+                    <h3 className="font-medium text-sm line-clamp-1">{product.name}</h3>
+                    <p className="text-xs text-muted-foreground mt-1">${product.price.toFixed(2)}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div className="md:col-span-1">
               <div className="glass-card p-6 animate-fade-in">
                 <h2 className="text-lg font-medium mb-4">Your Product</h2>
-                <ProductCard product={mainProduct} />
+                <ProductCard product={activeProduct} />
               </div>
             </div>
             <div className="md:col-span-2">
-              {comparisonMetrics && (
+              {comparisonMetrics && activeProductIndex < comparisonMetrics.length && (
                 <ComparisonTable
-                  productName={mainProduct.name}
-                  data={comparisonMetrics}
+                  productName={activeProduct.name}
+                  data={comparisonMetrics[activeProductIndex]}
                 />
               )}
             </div>
@@ -249,7 +276,7 @@ const Results = () => {
                       name: product.title,
                       image: product.galleryURL,
                       price: product.currentPrice || 0,
-                      marketPrice: mainProduct.price,
+                      marketPrice: activeProduct.price,
                       rating: product.rating,
                       sold: product.sold,
                       source: product.source,
@@ -261,7 +288,7 @@ const Results = () => {
             </div>
           </div>
 
-          {comparisonMetrics && (
+          {comparisonMetrics && activeProductIndex < comparisonMetrics.length && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -279,22 +306,22 @@ const Results = () => {
                 <p className="flex items-start mb-3">
                   <span className="font-medium mr-2">•</span>
                   <span>
-                    <span className="font-medium">Suggested price:</span> ${comparisonMetrics.suggestion.toFixed(2)} - This price is below the market average while maintaining profitability.
+                    <span className="font-medium">Suggested price:</span> ${comparisonMetrics[activeProductIndex].suggestion.toFixed(2)} - This price is below the market average while maintaining profitability.
                   </span>
                 </p>
                 <p className="flex items-start mb-3">
                   <span className="font-medium mr-2">•</span>
                   <span>
-                    <span className="font-medium">Rationale:</span> The average selling price on eBay is ${comparisonMetrics.average.toFixed(2)}, 
-                    making your current price of ${comparisonMetrics.yourPrice.toFixed(2)} {comparisonMetrics.yourPrice > comparisonMetrics.average ? 'above' : 'below'} market. 
-                    {comparisonMetrics.yourPrice > comparisonMetrics.average ? 'Reducing to the suggested price may increase sales volume.' : 'Your price is competitive in the current market.'}
+                    <span className="font-medium">Rationale:</span> The average selling price on eBay is ${comparisonMetrics[activeProductIndex].average.toFixed(2)}, 
+                    making your current price of ${comparisonMetrics[activeProductIndex].yourPrice.toFixed(2)} {comparisonMetrics[activeProductIndex].yourPrice > comparisonMetrics[activeProductIndex].average ? 'above' : 'below'} market. 
+                    {comparisonMetrics[activeProductIndex].yourPrice > comparisonMetrics[activeProductIndex].average ? 'Reducing to the suggested price may increase sales volume.' : 'Your price is competitive in the current market.'}
                   </span>
                 </p>
                 <p className="flex items-start">
                   <span className="font-medium mr-2">•</span>
                   <span>
                     <span className="font-medium">Alternative strategy:</span> {
-                      comparisonMetrics.yourPrice > comparisonMetrics.average 
+                      comparisonMetrics[activeProductIndex].yourPrice > comparisonMetrics[activeProductIndex].average 
                         ? 'If maintaining your current price point, consider offering free shipping or bundle deals to increase value perception.'
                         : 'Consider highlighting your competitive pricing in your listing to attract more buyers.'
                     }

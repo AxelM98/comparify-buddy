@@ -135,24 +135,28 @@ const UploadPage = () => {
     toast.info(`Preparing to compare ${products.length} products...`);
 
     try {
-      const mainProduct = products[0];
-      
-      const similarProducts = await searchEbayProducts({
-        keywords: mainProduct.name,
-        itemsPerPage: 10,
-      });
+      const productsWithComparisons = await Promise.all(
+        products.map(async (product) => {
+          const similarProducts = await searchEbayProducts({
+            keywords: product.name,
+            itemsPerPage: 10,
+          });
+
+          return {
+            id: `p${Math.random().toString(36).substring(2, 9)}`,
+            name: product.name,
+            price: parseFloat(product.price) || 0,
+            sku: product.sku,
+            description: product.description,
+            similarProducts
+          };
+        })
+      );
 
       sessionStorage.setItem(
         "comparisonData",
         JSON.stringify({
-          mainProduct: {
-            id: "p1",
-            name: mainProduct.name,
-            price: parseFloat(mainProduct.price),
-            sku: mainProduct.sku,
-            description: mainProduct.description,
-          },
-          similarProducts,
+          products: productsWithComparisons,
           timestamp: new Date().toISOString(),
         })
       );
