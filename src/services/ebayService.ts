@@ -58,32 +58,39 @@ export const searchEbayProducts = async (
 
     const url = `${baseUrl}?${queryParams.toString()}`;
     
-    // Make the API request
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        // Include any required auth headers here
-      },
-    });
+    // Due to CORS restrictions with the eBay API in browser environments,
+    // we'll attempt the fetch, but expect it might fail
+    try {
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          // Include any required auth headers here
+        },
+        // Note: 'no-cors' mode will result in an opaque response that can't be read
+        // So we're not using it as it would prevent us from accessing the response data
+      });
 
-    // For testing during development
-    if (!response.ok) {
-      console.error("eBay API Error:", response.status, response.statusText);
-      // In development, return mock data if the API fails
-      if (process.env.NODE_ENV !== "production") {
-        console.log("Using mock data since API failed");
-        return getMockProducts(params.keywords);
+      if (!response.ok) {
+        console.error("eBay API Error:", response.status, response.statusText);
+        throw new Error(`eBay API error: ${response.status} ${response.statusText}`);
       }
-      throw new Error(`eBay API error: ${response.status} ${response.statusText}`);
-    }
 
-    const data = await response.json();
-    console.log("eBay API response:", data);
-    
-    // Transform the response to our internal format
-    // This will need to be adjusted based on the actual API response structure
-    return transformEbayResponse(data);
+      const data = await response.json();
+      console.log("eBay API response:", data);
+      
+      return transformEbayResponse(data);
+    } catch (fetchError) {
+      console.error("CORS or fetch error with eBay API:", fetchError);
+      
+      // In a production environment, you would want to:
+      // 1. Use a proxy server to make these requests
+      // 2. Use eBay's official SDK which handles authentication properly
+      // For now, we'll use mock data
+      toast.warning("Unable to connect to eBay API directly due to CORS restrictions. Using sample data instead.");
+      
+      return getMockProducts(params.keywords);
+    }
   } catch (error) {
     console.error("Error searching eBay products:", error);
     toast.error("Failed to fetch eBay products. Using sample data instead.");
