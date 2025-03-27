@@ -64,8 +64,7 @@ const UploadPage = () => {
       setProducts([{ ...emptyProduct }]);
     } else if (method === "demo") {
       setProducts([...demoProducts]);
-      toast({
-        title: "Demo products loaded",
+      toast("Demo products loaded", {
         description: "3 demo products have been loaded for testing",
       });
     } else {
@@ -112,8 +111,7 @@ const UploadPage = () => {
 
   const handleFileUpload = (file: File) => {
     setFileName(file.name);
-    toast({
-      title: "File uploaded",
+    toast("File uploaded", {
       description: `${file.name} has been uploaded`,
     });
 
