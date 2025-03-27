@@ -32,9 +32,16 @@ const ProductCard: React.FC<ProductCardProps> = ({
     source = "eBay",
   } = product;
 
-  const priceDifference = marketPrice ? marketPrice - price : 0;
-  const percentageDiff = marketPrice ? (priceDifference / marketPrice) * 100 : 0;
+  // Safely calculate price differences with null checks
+  const priceDifference = marketPrice != null ? marketPrice - price : 0;
+  const percentageDiff = marketPrice != null ? (priceDifference / marketPrice) * 100 : 0;
   const isPriceHigher = priceDifference < 0;
+
+  // Helper function to safely format numbers
+  const safeToFixed = (value: number | null | undefined, digits: number = 2): string => {
+    if (value == null) return "0.00";
+    return value.toFixed(digits);
+  };
 
   return (
     <div className="glass-card overflow-hidden flex flex-col animate-scale-in">
@@ -77,7 +84,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </h3>
 
         <div className="mt-auto">
-          {isComparison && marketPrice && (
+          {isComparison && marketPrice != null && (
             <div
               className={`flex items-center text-xs mb-2 ${
                 isPriceHigher ? "text-destructive" : "text-emerald-600"
@@ -87,7 +94,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
               <span>
                 {isPriceHigher
                   ? `${Math.abs(percentageDiff).toFixed(1)}% above market`
-                  : `${percentageDiff.toFixed(1)}% below market`}
+                  : `${safeToFixed(percentageDiff, 1)}% below market`}
               </span>
             </div>
           )}
@@ -97,19 +104,19 @@ const ProductCard: React.FC<ProductCardProps> = ({
               <div className="flex items-baseline space-x-2">
                 <span className="text-lg font-semibold">
                   {currency}
-                  {price.toFixed(2)}
+                  {safeToFixed(price)}
                 </span>
-                {isComparison && marketPrice && (
+                {isComparison && marketPrice != null && (
                   <span className="text-sm text-muted-foreground line-through">
                     {currency}
-                    {marketPrice.toFixed(2)}
+                    {safeToFixed(marketPrice)}
                   </span>
                 )}
               </div>
               
               {isComparison && (
                 <div className="text-xs text-muted-foreground flex items-center mt-1">
-                  <span className="mr-2">★ {rating.toFixed(1)}</span>
+                  <span className="mr-2">★ {safeToFixed(rating, 1)}</span>
                   <span>{sold} sold</span>
                 </div>
               )}
