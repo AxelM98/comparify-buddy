@@ -1,7 +1,6 @@
-
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { motion } from "framer-motion";
 import {
   Upload,
@@ -12,7 +11,9 @@ import {
   X,
   File,
   ArrowRight,
+  Loader2,
 } from "lucide-react";
+import { searchEbayProducts } from "@/services/ebayService";
 
 interface ProductInput {
   name: string;
@@ -50,11 +51,12 @@ const demoProducts = [
 ];
 
 const UploadPage = () => {
-  const { toast } = useToast();
+  const navigate = useNavigate();
   const [uploadMethod, setUploadMethod] = useState<string | null>(null);
   const [products, setProducts] = useState<ProductInput[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [fileName, setFileName] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleMethodSelect = (method: string) => {
     setUploadMethod(method);
@@ -109,28 +111,63 @@ const UploadPage = () => {
   };
 
   const handleFileUpload = (file: File) => {
-    // In a real app, we would parse the CSV/Excel file here
     setFileName(file.name);
     toast({
       title: "File uploaded",
       description: `${file.name} has been uploaded`,
     });
 
-    // Simulating products loaded from file
     setTimeout(() => {
       setProducts([...demoProducts]);
     }, 1000);
   };
 
-  const handleSubmit = () => {
-    // In a real app, we would submit the products for comparison here
-    toast({
-      title: "Products submitted",
-      description: `${products.length} products submitted for comparison`,
-    });
+  const handleSubmit = async () => {
+    if (products.length === 0) {
+      toast.error("Please add at least one product.");
+      return;
+    }
 
-    // Navigate to results page (this would be handled by React Router in a real app)
-    window.location.href = "/results";
+    if (products.some(p => !p.name.trim())) {
+      toast.error("All products must have a name.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    toast.info(`Preparing to compare ${products.length} products...`);
+
+    try {
+      const mainProduct = products[0];
+      
+      const similarProducts = await searchEbayProducts({
+        keywords: mainProduct.name,
+        itemsPerPage: 10,
+      });
+
+      sessionStorage.setItem(
+        "comparisonData",
+        JSON.stringify({
+          mainProduct: {
+            id: "p1",
+            name: mainProduct.name,
+            price: parseFloat(mainProduct.price),
+            sku: mainProduct.sku,
+            description: mainProduct.description,
+          },
+          similarProducts,
+          timestamp: new Date().toISOString(),
+        })
+      );
+
+      toast.success(`${products.length} products submitted for comparison`);
+      
+      navigate("/results");
+    } catch (error) {
+      console.error("Error processing products:", error);
+      toast.error("Failed to process products. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -328,17 +365,23 @@ const UploadPage = () => {
 
             {products.length > 0 && (
               <div className="mt-8 flex justify-end">
-                <Link
-                  to="/results"
+                <button
+                  onClick={handleSubmit}
+                  disabled={isSubmitting}
                   className="btn-primary flex items-center"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleSubmit();
-                  }}
                 >
-                  Compare Products
-                  <ArrowRight size={16} className="ml-2" />
-                </Link>
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 size={16} className="mr-2 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      Compare Products
+                      <ArrowRight size={16} className="ml-2" />
+                    </>
+                  )}
+                </button>
               </div>
             )}
           </motion.div>
@@ -348,7 +391,6 @@ const UploadPage = () => {
   );
 };
 
-// Upload options
 const uploadOptions = [
   {
     id: "file",
