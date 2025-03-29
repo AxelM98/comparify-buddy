@@ -14,8 +14,25 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
+interface Product {
+  id: string;
+  name: string;
+  image?: string;
+  price: number;
+  sku?: string;
+  description?: string;
+  similarProducts: any[];
+}
+
+interface Comparison {
+  products: Product[];
+  mainProduct?: Product;  // For backward compatibility
+  timestamp: string;
+  similarProducts?: any[]; // For backward compatibility
+}
+
 const SavedComparisons = () => {
-  const [comparisons, setComparisons] = useState<any[]>([]);
+  const [comparisons, setComparisons] = useState<Comparison[]>([]);
   const [isEmpty, setIsEmpty] = useState(false);
 
   useEffect(() => {
@@ -39,7 +56,50 @@ const SavedComparisons = () => {
   const handleExport = (index: number) => {
     // In a real app, this would generate a CSV or PDF
     // For now, just show a toast
-    toast.success(`Export for "${comparisons[index].mainProduct.name}" coming soon`);
+    const comparison = comparisons[index];
+    const productName = getMainProductName(comparison);
+    toast.success(`Export for "${productName}" coming soon`);
+  };
+
+  // Helper function to get the main product name, handling both data structures
+  const getMainProductName = (comparison: Comparison): string => {
+    if (comparison.mainProduct && comparison.mainProduct.name) {
+      return comparison.mainProduct.name;
+    }
+    
+    if (comparison.products && comparison.products.length > 0 && comparison.products[0].name) {
+      return comparison.products[0].name;
+    }
+    
+    return "Unknown Product";
+  };
+
+  // Helper function to get the main product price
+  const getMainProductPrice = (comparison: Comparison): number => {
+    if (comparison.mainProduct && typeof comparison.mainProduct.price === 'number') {
+      return comparison.mainProduct.price;
+    }
+    
+    if (comparison.products && comparison.products.length > 0 && typeof comparison.products[0].price === 'number') {
+      return comparison.products[0].price;
+    }
+    
+    return 0;
+  };
+
+  // Helper function to get similar products count
+  const getSimilarProductsCount = (comparison: Comparison): number => {
+    if (comparison.similarProducts && Array.isArray(comparison.similarProducts)) {
+      return comparison.similarProducts.length;
+    }
+    
+    if (comparison.products && comparison.products.length > 0 && 
+        comparison.products[0].similarProducts && 
+        Array.isArray(comparison.products[0].similarProducts)) {
+      return comparison.products[0].similarProducts.length;
+    }
+    
+    return 0;
   };
 
   const formatDate = (dateString: string) => {
@@ -89,7 +149,7 @@ const SavedComparisons = () => {
             <div className="space-y-6">
               {comparisons.map((comparison, index) => (
                 <motion.div
-                  key={`${comparison.mainProduct.id}-${index}`}
+                  key={`comparison-${index}`}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: index * 0.1 }}
@@ -98,7 +158,7 @@ const SavedComparisons = () => {
                   <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
                     <div className="mb-4 lg:mb-0">
                       <h2 className="text-xl font-medium mb-2">
-                        {comparison.mainProduct.name}
+                        {getMainProductName(comparison)}
                       </h2>
                       <div className="flex flex-wrap items-center text-sm text-muted-foreground">
                         <div className="flex items-center mr-6 mb-2">
@@ -107,11 +167,11 @@ const SavedComparisons = () => {
                         </div>
                         <div className="flex items-center mr-6 mb-2">
                           <Tag size={14} className="mr-1.5" />
-                          <span>${comparison.mainProduct.price.toFixed(2)}</span>
+                          <span>${getMainProductPrice(comparison).toFixed(2)}</span>
                         </div>
                         <div className="flex items-center mb-2">
                           <BarChart4 size={14} className="mr-1.5" />
-                          <span>{comparison.similarProducts.length} similar products</span>
+                          <span>{getSimilarProductsCount(comparison)} similar products</span>
                         </div>
                       </div>
                     </div>
