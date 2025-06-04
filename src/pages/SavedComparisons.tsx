@@ -1,18 +1,18 @@
-
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { 
-  ArrowLeft, 
-  Trash2, 
-  BarChart4, 
-  Calendar, 
+import {
+  ArrowLeft,
+  Trash2,
+  BarChart4,
+  Calendar,
   Tag,
   Info,
   Download,
-  ExternalLink
+  ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "@/context/AuthContext";
 
 interface Product {
   id: string;
@@ -25,90 +25,112 @@ interface Product {
 }
 
 interface Comparison {
+  _id?: string; // only present when fetched from DB
   products: Product[];
-  mainProduct?: Product;  // For backward compatibility
+  mainProduct?: Product;
   timestamp: string;
-  similarProducts?: any[]; // For backward compatibility
+  similarProducts?: any[];
 }
 
 const SavedComparisons = () => {
   const [comparisons, setComparisons] = useState<Comparison[]>([]);
   const [isEmpty, setIsEmpty] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
-    // Load saved comparisons from localStorage
-    const saved = JSON.parse(localStorage.getItem("savedComparisons") || "[]");
-    setComparisons(saved);
-    setIsEmpty(saved.length === 0);
-  }, []);
+    const fetchSavedComparisons = async () => {
+      try {
+        if (user) {
+          const res = await fetch("http://localhost:5001/api/analysis", {
+            credentials: "include",
+          });
+          const data = await res.json();
+          setComparisons(data);
+          setIsEmpty(data.length === 0);
+        } else {
+          const saved = JSON.parse(
+            localStorage.getItem("savedComparisons") || "[]"
+          );
+          setComparisons(saved);
+          setIsEmpty(saved.length === 0);
+        }
+      } catch (err) {
+        console.error("Error fetching saved comparisons:", err);
+        toast.error("Couldn't load saved comparisons.");
+      }
+    };
 
-  const handleDelete = (index: number) => {
-    const updatedComparisons = [...comparisons];
-    updatedComparisons.splice(index, 1);
-    
-    localStorage.setItem("savedComparisons", JSON.stringify(updatedComparisons));
-    setComparisons(updatedComparisons);
-    setIsEmpty(updatedComparisons.length === 0);
-    
-    toast.success("Comparison removed from saved list");
+    fetchSavedComparisons();
+  }, [user]);
+
+  const handleDelete = async (index: number) => {
+    const updated = [...comparisons];
+    const analysisToDelete = updated[index];
+
+    if (user && analysisToDelete._id) {
+      try {
+        const res = await fetch(
+          `http://localhost:5001/api/analysis/${analysisToDelete._id}`,
+          {
+            method: "DELETE",
+            credentials: "include",
+          }
+        );
+
+        if (!res.ok) throw new Error("Delete failed");
+
+        updated.splice(index, 1);
+        setComparisons(updated);
+        setIsEmpty(updated.length === 0);
+        toast.success("Comparison deleted");
+      } catch (err) {
+        console.error(err);
+        toast.error("Failed to delete comparison");
+      }
+    } else {
+      updated.splice(index, 1);
+      localStorage.setItem("savedComparisons", JSON.stringify(updated));
+      setComparisons(updated);
+      setIsEmpty(updated.length === 0);
+      toast.success("Comparison removed from saved list");
+    }
   };
 
   const handleExport = (index: number) => {
-    // In a real app, this would generate a CSV or PDF
-    // For now, just show a toast
     const comparison = comparisons[index];
     const productName = getMainProductName(comparison);
     toast.success(`Export for "${productName}" coming soon`);
   };
 
-  // Helper function to get the main product name, handling both data structures
   const getMainProductName = (comparison: Comparison): string => {
-    if (comparison.mainProduct && comparison.mainProduct.name) {
-      return comparison.mainProduct.name;
-    }
-    
-    if (comparison.products && comparison.products.length > 0 && comparison.products[0].name) {
-      return comparison.products[0].name;
-    }
-    
+    if (comparison.mainProduct?.name) return comparison.mainProduct.name;
+    if (comparison.products?.[0]?.name) return comparison.products[0].name;
     return "Unknown Product";
   };
 
-  // Helper function to get the main product price
   const getMainProductPrice = (comparison: Comparison): number => {
-    if (comparison.mainProduct && typeof comparison.mainProduct.price === 'number') {
+    if (typeof comparison.mainProduct?.price === "number")
       return comparison.mainProduct.price;
-    }
-    
-    if (comparison.products && comparison.products.length > 0 && typeof comparison.products[0].price === 'number') {
+    if (typeof comparison.products?.[0]?.price === "number")
       return comparison.products[0].price;
-    }
-    
     return 0;
   };
 
-  // Helper function to get similar products count
   const getSimilarProductsCount = (comparison: Comparison): number => {
-    if (comparison.similarProducts && Array.isArray(comparison.similarProducts)) {
+    if (Array.isArray(comparison.similarProducts))
       return comparison.similarProducts.length;
-    }
-    
-    if (comparison.products && comparison.products.length > 0 && 
-        comparison.products[0].similarProducts && 
-        Array.isArray(comparison.products[0].similarProducts)) {
+    if (Array.isArray(comparison.products?.[0]?.similarProducts))
       return comparison.products[0].similarProducts.length;
-    }
-    
     return 0;
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -136,10 +158,12 @@ const SavedComparisons = () => {
               <div className="bg-primary/10 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
                 <Info size={32} className="text-primary" />
               </div>
-              <h2 className="text-xl font-medium mb-3">No saved comparisons yet</h2>
+              <h2 className="text-xl font-medium mb-3">
+                No saved comparisons yet
+              </h2>
               <p className="text-muted-foreground mb-6">
-                You haven't saved any product comparisons yet. Compare a product and click 
-                "Save" to add it to your saved list.
+                You haven't saved any product comparisons yet. Compare a product
+                and click "Save" to add it to your saved list.
               </p>
               <Link to="/upload" className="btn-primary">
                 Compare Products
@@ -167,16 +191,21 @@ const SavedComparisons = () => {
                         </div>
                         <div className="flex items-center mr-6 mb-2">
                           <Tag size={14} className="mr-1.5" />
-                          <span>${getMainProductPrice(comparison).toFixed(2)}</span>
+                          <span>
+                            ${getMainProductPrice(comparison).toFixed(2)}
+                          </span>
                         </div>
                         <div className="flex items-center mb-2">
                           <BarChart4 size={14} className="mr-1.5" />
-                          <span>{getSimilarProductsCount(comparison)} similar products</span>
+                          <span>
+                            {getSimilarProductsCount(comparison)} similar
+                            products
+                          </span>
                         </div>
                       </div>
                     </div>
                     <div className="flex flex-wrap items-center gap-3">
-                      <button 
+                      <button
                         onClick={() => handleExport(index)}
                         className="btn-ghost text-sm px-3 py-2 flex items-center"
                       >
@@ -186,9 +215,8 @@ const SavedComparisons = () => {
                       <Link
                         to="/results"
                         onClick={() => {
-                          // Store in sessionStorage to view in results page
                           sessionStorage.setItem(
-                            "comparisonData", 
+                            "comparisonData",
                             JSON.stringify(comparison)
                           );
                         }}

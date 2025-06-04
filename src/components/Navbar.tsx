@@ -1,14 +1,16 @@
-
 import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Menu, X, BarChart, Upload, User, Save } from "lucide-react";
+import { Menu, X, BarChart, Upload, User, Save, LogOut } from "lucide-react";
 import DarkModeToggle from "./DarkModeToggle";
+import { useAuth } from "@/context/AuthContext";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, setUser } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -23,14 +25,28 @@ const Navbar = () => {
     setIsMobileMenuOpen(false);
   }, [location.pathname]);
 
+  const handleLogout = async () => {
+    await fetch("http://localhost:5001/auth/logout", {
+      method: "GET",
+      credentials: "include",
+    });
+    setUser(null);
+    navigate("/");
+  };
+
   const navLinks = [
     { name: "Home", href: "/", icon: <BarChart size={18} /> },
     { name: "Upload", href: "/upload", icon: <Upload size={18} /> },
     { name: "Saved", href: "/saved", icon: <Save size={18} /> },
-    { name: "Login", href: "/auth", icon: <User size={18} /> },
   ];
 
   const isActive = (path: string) => location.pathname === path;
+
+  useEffect(() => {
+    if (user) {
+      console.log("Current user object:", user);
+    }
+  }, [user]);
 
   return (
     <motion.header
@@ -52,7 +68,6 @@ const Navbar = () => {
             <span className="text-primary dark:text-blue-400">Comparify</span>
           </Link>
 
-          {/* Desktop navigation */}
           <nav className="hidden md:flex items-center space-x-1">
             {navLinks.map((link) => (
               <Link
@@ -68,56 +83,49 @@ const Navbar = () => {
                 <span>{link.name}</span>
               </Link>
             ))}
-            <div className="ml-4">
-              <DarkModeToggle />
-            </div>
-          </nav>
 
-          {/* Mobile navigation toggle */}
-          <div className="md:hidden flex items-center space-x-4">
-            <DarkModeToggle />
-            <button
-              className="flex items-center"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              aria-label="Toggle navigation menu"
-            >
-              {isMobileMenuOpen ? (
-                <X className="h-6 w-6 text-foreground dark:text-gray-200" />
-              ) : (
-                <Menu className="h-6 w-6 text-foreground dark:text-gray-200" />
-              )}
-            </button>
-          </div>
+            {user ? (
+              <div className="flex items-center space-x-3 ml-4">
+                {user.photos && (
+                  <img
+                    src={user.photos[0].value}
+                    alt="Avatar"
+                    className="w-8 h-8 rounded-full"
+                  />
+                )}
+                <span className="mr-2">
+                  {user.name?.givenName || user.displayName || "User"}
+                </span>
+
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center space-x-2 px-4 py-2 rounded-xl hover:bg-secondary dark:hover:bg-gray-800 text-foreground dark:text-gray-200 transition-all duration-200"
+                >
+                  <LogOut size={18} />
+                  <span>Log out</span>
+                </button>
+
+                <div className="ml-4">
+                  <DarkModeToggle />
+                </div>
+              </div>
+            ) : (
+              <>
+                <Link
+                  to="/auth"
+                  className="flex items-center space-x-2 px-4 py-2 rounded-xl hover:bg-secondary dark:hover:bg-gray-800 text-foreground dark:text-gray-200"
+                >
+                  <User size={18} />
+                  <span>Login</span>
+                </Link>
+                <div className="ml-4">
+                  <DarkModeToggle />
+                </div>
+              </>
+            )}
+          </nav>
         </div>
       </div>
-
-      {/* Mobile navigation menu */}
-      {isMobileMenuOpen && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: "auto" }}
-          exit={{ opacity: 0, height: 0 }}
-          transition={{ duration: 0.3 }}
-          className="md:hidden glass-card mt-2 mx-4 rounded-xl overflow-hidden dark:bg-gray-900/90 dark:border-gray-800"
-        >
-          <nav className="flex flex-col p-2 space-y-1">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                to={link.href}
-                className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                  isActive(link.href)
-                    ? "bg-primary text-primary-foreground dark:bg-blue-600"
-                    : "hover:bg-secondary dark:hover:bg-gray-800 text-foreground dark:text-gray-200"
-                }`}
-              >
-                {link.icon}
-                <span>{link.name}</span>
-              </Link>
-            ))}
-          </nav>
-        </motion.div>
-      )}
     </motion.header>
   );
 };

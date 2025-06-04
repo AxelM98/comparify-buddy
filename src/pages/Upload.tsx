@@ -126,7 +126,7 @@ const UploadPage = () => {
       return;
     }
 
-    if (products.some(p => !p.name.trim())) {
+    if (products.some((p) => !p.name.trim())) {
       toast.error("All products must have a name.");
       return;
     }
@@ -148,7 +148,7 @@ const UploadPage = () => {
             price: parseFloat(product.price) || 0,
             sku: product.sku,
             description: product.description,
-            similarProducts
+            similarProducts,
           };
         })
       );
@@ -162,7 +162,7 @@ const UploadPage = () => {
       );
 
       toast.success(`${products.length} products submitted for comparison`);
-      
+
       navigate("/results");
     } catch (error) {
       console.error("Error processing products:", error);
@@ -181,9 +181,12 @@ const UploadPage = () => {
           transition={{ duration: 0.5 }}
           className="text-center mb-12"
         >
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">Upload Products</h1>
+          <h1 className="text-3xl md:text-4xl font-bold mb-4">
+            Upload Products
+          </h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Upload your products for comparison with eBay listings. Choose a method below to get started.
+            Upload your products for comparison with eBay listings. Choose a
+            method below to get started.
           </p>
         </motion.div>
 
@@ -202,7 +205,9 @@ const UploadPage = () => {
                   {option.icon}
                 </div>
                 <h3 className="text-lg font-medium mb-2">{option.title}</h3>
-                <p className="text-sm text-muted-foreground">{option.description}</p>
+                <p className="text-sm text-muted-foreground">
+                  {option.description}
+                </p>
               </motion.div>
             ))}
           </div>
@@ -244,7 +249,10 @@ const UploadPage = () => {
                 onDragLeave={() => setIsDragging(false)}
                 onDrop={handleFileDrop}
               >
-                <File size={48} className="mx-auto mb-4 text-muted-foreground" />
+                <File
+                  size={48}
+                  className="mx-auto mb-4 text-muted-foreground"
+                />
                 <h3 className="text-lg font-medium mb-2">
                   {fileName ? fileName : "Drag & Drop File"}
                 </h3>
@@ -265,7 +273,9 @@ const UploadPage = () => {
                   Browse Files
                 </label>
                 {fileName && (
-                  <p className="mt-4 text-sm text-primary">{products.length} products loaded</p>
+                  <p className="mt-4 text-sm text-primary">
+                    {products.length} products loaded
+                  </p>
                 )}
               </div>
             )}
@@ -276,10 +286,18 @@ const UploadPage = () => {
                   <table className="w-full border-collapse">
                     <thead>
                       <tr className="border-b border-border">
-                        <th className="py-3 px-4 text-left font-medium text-sm">Product Name</th>
-                        <th className="py-3 px-4 text-left font-medium text-sm">Price</th>
-                        <th className="py-3 px-4 text-left font-medium text-sm">SKU/EAN</th>
-                        <th className="py-3 px-4 text-left font-medium text-sm">Description</th>
+                        <th className="py-3 px-4 text-left font-medium text-sm">
+                          Product Name
+                        </th>
+                        <th className="py-3 px-4 text-left font-medium text-sm">
+                          Price
+                        </th>
+                        <th className="py-3 px-4 text-left font-medium text-sm">
+                          SKU/EAN
+                        </th>
+                        <th className="py-3 px-4 text-left font-medium text-sm">
+                          Description
+                        </th>
                         <th className="py-3 px-4 text-left font-medium text-sm w-10"></th>
                       </tr>
                     </thead>
@@ -291,7 +309,11 @@ const UploadPage = () => {
                               type="text"
                               value={product.name}
                               onChange={(e) =>
-                                handleProductChange(index, "name", e.target.value)
+                                handleProductChange(
+                                  index,
+                                  "name",
+                                  e.target.value
+                                )
                               }
                               placeholder="Product name"
                               className="glass-input w-full px-3 py-2"
@@ -304,7 +326,11 @@ const UploadPage = () => {
                                 type="text"
                                 value={product.price}
                                 onChange={(e) =>
-                                  handleProductChange(index, "price", e.target.value)
+                                  handleProductChange(
+                                    index,
+                                    "price",
+                                    e.target.value
+                                  )
                                 }
                                 placeholder="0.00"
                                 className="glass-input w-full px-3 py-2 pl-6"
@@ -316,7 +342,11 @@ const UploadPage = () => {
                               type="text"
                               value={product.sku}
                               onChange={(e) =>
-                                handleProductChange(index, "sku", e.target.value)
+                                handleProductChange(
+                                  index,
+                                  "sku",
+                                  e.target.value
+                                )
                               }
                               placeholder="SKU or EAN"
                               className="glass-input w-full px-3 py-2"

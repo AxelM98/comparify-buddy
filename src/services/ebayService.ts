@@ -1,9 +1,6 @@
 
 import { toast } from "sonner";
 
-// eBay API credentials - This appears to be a sandbox app ID
-const APP_ID = "AxelMagn-Test-SBX-8b7ec7265-4b89c0d2";
-
 interface EbaySearchParams {
   keywords: string;
   categoryId?: string;
@@ -35,112 +32,57 @@ export const searchEbayProducts = async (
   params: EbaySearchParams
 ): Promise<EbayProduct[]> => {
   try {
-    console.log("Searching eBay with params:", params);
-    
-    // In a production environment, these requests should be made through:
-    // 1. A proxy server (like a serverless function)
-    // 2. Using Node.js on a server (not in the browser)
-    // 3. Using eBay's official SDK
-    
-    // For this implementation, we'll use a CORS proxy service
-    // Note: In production, you should use your own proxy or serverless function
-    const corsProxy = "https://corsproxy.io/?";
-    
-    // Build the eBay Shopping API URL
-    const baseUrl = "https://open.api.ebay.com/shopping";
-    
-    const queryParams = new URLSearchParams({
-      callname: "FindItems", // Using FindItems instead of FindProducts
-      responseencoding: "JSON",
-      appid: APP_ID,
-      siteid: "0", // US site
-      version: "1.0.0",
-      QueryKeywords: params.keywords,
-      MaxEntries: params.itemsPerPage?.toString() || "10",
-      PageNumber: params.pageNumber?.toString() || "1",
-      OutputSelector: "SellerInfo,ItemSpecifics,PictureDetails,GalleryInfo"
+    console.log("🔍 Searching eBay via proxy with params:", params);
+
+    const query = new URLSearchParams({
+      keywords: params.keywords,
     });
 
-    if (params.categoryId) {
-      queryParams.append("CategoryID", params.categoryId);
+    const response = await fetch(`/api/ebay-search?${query.toString()}`);
+
+    if (!response.ok) {
+      throw new Error(`eBay Proxy API error: ${response.status}`);
     }
 
-    const url = `${corsProxy}${encodeURIComponent(`${baseUrl}?${queryParams.toString()}`)}`;
-    
-    try {
-      console.log("Fetching from URL:", url);
-      
-      const response = await fetch(url, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+    const data = await response.json();
+    console.log("✅ eBay data received:", data);
 
-      if (!response.ok) {
-        console.error("eBay API Error:", response.status, response.statusText);
-        throw new Error(`eBay API error: ${response.status} ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      console.log("eBay API response:", data);
-      
-      return transformEbayResponse(data);
-    } catch (fetchError) {
-      console.error("Error fetching from eBay API:", fetchError);
-      
-      // If we can't fetch from the proxy either, use mock data
-      toast.warning("Unable to connect to eBay API. Using sample data instead.");
-      
-      return getMockProducts(params.keywords);
-    }
+    return transformBrowseApiResponse(data);
   } catch (error) {
-    console.error("Error searching eBay products:", error);
+    console.error("❌ Error searching eBay products via proxy:", error);
     toast.error("Failed to fetch eBay products. Using sample data instead.");
-    
-    // Return mock data if there's an error
     return getMockProducts(params.keywords);
   }
 };
 
-/**
- * Transform eBay API response to our internal format
- */
-const transformEbayResponse = (data: any): EbayProduct[] => {
-  try {
-    // Check if we have valid response data with items
-    if (!data || !data.Item || !Array.isArray(data.Item)) {
-      console.error("Invalid eBay API response structure:", data);
-      return getMockProducts("fallback");
-    }
-    
-    // Map the response to our internal format
-    return data.Item.map((item: any) => {
-      // Generate a random sold count and rating for demo purposes
-      // In real implementation, this data would come from the API or another source
-      const sold = Math.floor(Math.random() * 200) + 10;
-      const rating = Number((Math.random() * 1.5 + 3.5).toFixed(1));
-      
-      return {
-        id: item.ItemID || `item-${Math.random().toString(36).substr(2, 9)}`,
-        title: item.Title || "Unknown Item",
-        viewItemURL: item.ViewItemURLForNaturalSearch || item.ViewItemURL,
-        galleryURL: item.PictureURL?.[0] || item.GalleryURL || "https://images.unsplash.com/photo-1600185365483-26d7a4cc7519",
-        currentPrice: item.ConvertedCurrentPrice?.Value || 0,
-        listingType: item.ListingType || "Unknown",
-        timeLeft: item.TimeLeft || "",
-        location: item.Location || "",
-        shippingCost: item.ShippingCostSummary?.ShippingServiceCost?.Value || 0,
-        condition: item.ConditionDisplayName || "",
-        sold,
-        rating,
-        source: "eBay",
-      };
-    });
-  } catch (error) {
-    console.error("Error transforming eBay response:", error);
-    return getMockProducts("error");
+
+const transformBrowseApiResponse = (data: any): EbayProduct[] => {
+  if (!data || !data.itemSummaries) {
+    console.error("Invalid Browse API response", data);
+    return getMockProducts("fallback");
   }
+
+  return data.itemSummaries.map((item: any) => {
+    const price = item.price?.value ? Number(item.price.value) : 0;
+    const sold = Math.floor(Math.random() * 200) + 10;
+    const rating = Number((Math.random() * 1.5 + 3.5).toFixed(1));
+
+    return {
+      id: item.itemId,
+      title: item.title,
+      viewItemURL: item.itemWebUrl,
+      galleryURL: item.image?.imageUrl || "https://via.placeholder.com/150",
+      currentPrice: price,
+      listingType: item.buyingOptions?.[0] || "Unknown",
+      timeLeft: "",
+      location: item.itemLocation?.country || "",
+      shippingCost: 0,
+      condition: item.condition || "",
+      sold,
+      rating,
+      source: "eBay",
+    };
+  });
 };
 
 /**

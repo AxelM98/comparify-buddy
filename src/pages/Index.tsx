@@ -21,7 +21,7 @@ const Index = () => {
             </div>
             <h1 className="text-4xl md:text-6xl font-bold mb-6 tracking-tight">
               Optimize Your Product Pricing
-              <br className="hidden md:block" /> with
+              <br className="hidden md:block" /> with real
               <span className="text-gradient"> Market Data</span>
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-10">

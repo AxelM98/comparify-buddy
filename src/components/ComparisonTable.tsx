@@ -1,4 +1,3 @@
-
 import React from "react";
 import { ArrowDown, ArrowUp, Minus, Info, BarChart2 } from "lucide-react";
 
@@ -67,16 +66,22 @@ const ComparisonTable: React.FC<ComparisonTableProps> = ({
           <div className="text-3xl font-medium">${median.toFixed(2)}</div>
           <div className="text-sm text-muted-foreground mt-1">
             {yourPrice > median
-              ? `${((yourPrice - median) / median * 100).toFixed(1)}% above median`
+              ? `${(((yourPrice - median) / median) * 100).toFixed(
+                  1
+                )}% above median`
               : yourPrice < median
-              ? `${((median - yourPrice) / median * 100).toFixed(1)}% below median`
+              ? `${(((median - yourPrice) / median) * 100).toFixed(
+                  1
+                )}% below median`
               : "Equal to median"}
           </div>
         </div>
 
         <div className="bg-secondary/50 rounded-xl p-4">
           <div className="flex justify-between items-start mb-2">
-            <span className="text-muted-foreground text-sm">Market Average</span>
+            <span className="text-muted-foreground text-sm">
+              Market Average
+            </span>
             <div className="flex items-center space-x-1">
               {getStatusIcon(getPriceStatus(average))}
             </div>
@@ -84,9 +89,13 @@ const ComparisonTable: React.FC<ComparisonTableProps> = ({
           <div className="text-3xl font-medium">${average.toFixed(2)}</div>
           <div className="text-sm text-muted-foreground mt-1">
             {yourPrice > average
-              ? `${((yourPrice - average) / average * 100).toFixed(1)}% above average`
+              ? `${(((yourPrice - average) / average) * 100).toFixed(
+                  1
+                )}% above average`
               : yourPrice < average
-              ? `${((average - yourPrice) / average * 100).toFixed(1)}% below average`
+              ? `${(((average - yourPrice) / average) * 100).toFixed(
+                  1
+                )}% below average`
               : "Equal to average"}
           </div>
         </div>
@@ -110,7 +119,9 @@ const ComparisonTable: React.FC<ComparisonTableProps> = ({
               <Info size={14} />
             </button>
           </div>
-          <span className="font-medium text-primary">${suggestion.toFixed(2)}</span>
+          <span className="font-medium text-primary">
+            ${suggestion.toFixed(2)}
+          </span>
         </div>
       </div>
     </div>

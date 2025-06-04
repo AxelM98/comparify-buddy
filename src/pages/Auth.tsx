@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
@@ -28,7 +27,7 @@ const Auth = () => {
     // Simulate API call
     setTimeout(() => {
       setIsLoading(false);
-      
+
       if (isLogin) {
         toast({
           title: "Login successful",
@@ -52,7 +51,7 @@ const Auth = () => {
     // Simulate API call
     setTimeout(() => {
       setIsLoading(false);
-      
+
       toast({
         title: "Demo mode activated",
         description: "You are now using Comparify in demo mode.",
@@ -73,7 +72,10 @@ const Auth = () => {
             transition={{ duration: 0.5 }}
             className="bg-primary/10 p-12 hidden md:flex md:flex-col dark:bg-primary/5"
           >
-            <Link to="/" className="flex items-center space-x-2 text-xl font-semibold">
+            <Link
+              to="/"
+              className="flex items-center space-x-2 text-xl font-semibold"
+            >
               <span className="text-primary">Comparify</span>
             </Link>
             <div className="mt-auto">
@@ -81,7 +83,8 @@ const Auth = () => {
                 Optimize your e-commerce pricing strategy
               </h2>
               <p className="text-muted-foreground mb-8 dark:text-gray-300">
-                Compare your products with market data to make better pricing decisions.
+                Compare your products with market data to make better pricing
+                decisions.
               </p>
               <img
                 src="https://images.unsplash.com/photo-1553729459-efe14ef6055d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"
@@ -90,7 +93,7 @@ const Auth = () => {
               />
             </div>
           </motion.div>
-          
+
           <motion.div
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -98,11 +101,14 @@ const Auth = () => {
             className="bg-white p-8 sm:p-12 dark:bg-gray-900"
           >
             <div className="md:hidden mb-10">
-              <Link to="/" className="flex items-center space-x-2 text-xl font-semibold">
+              <Link
+                to="/"
+                className="flex items-center space-x-2 text-xl font-semibold"
+              >
                 <span className="text-primary">Comparify</span>
               </Link>
             </div>
-            
+
             <div className="mb-10">
               <h2 className="text-2xl font-bold mb-2 dark:text-white">
                 {isLogin ? "Sign in to your account" : "Create your account"}
@@ -117,7 +123,10 @@ const Auth = () => {
             <form onSubmit={handleSubmit} className="space-y-5">
               {!isLogin && (
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium mb-2 dark:text-gray-200">
+                  <label
+                    htmlFor="name"
+                    className="block text-sm font-medium mb-2 dark:text-gray-200"
+                  >
                     Full Name
                   </label>
                   <input
@@ -132,9 +141,12 @@ const Auth = () => {
                   />
                 </div>
               )}
-              
+
               <div>
-                <label htmlFor="email" className="block text-sm font-medium mb-2 dark:text-gray-200">
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium mb-2 dark:text-gray-200"
+                >
                   Email Address
                 </label>
                 <input
@@ -148,9 +160,12 @@ const Auth = () => {
                   placeholder="Enter your email"
                 />
               </div>
-              
+
               <div>
-                <label htmlFor="password" className="block text-sm font-medium mb-2 dark:text-gray-200">
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium mb-2 dark:text-gray-200"
+                >
                   Password
                 </label>
                 <div className="relative">
@@ -183,12 +198,18 @@ const Auth = () => {
                       type="checkbox"
                       className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary/50 dark:border-gray-700 dark:bg-gray-800"
                     />
-                    <label htmlFor="remember-me" className="ml-2 block text-sm dark:text-gray-300">
+                    <label
+                      htmlFor="remember-me"
+                      className="ml-2 block text-sm dark:text-gray-300"
+                    >
                       Remember me
                     </label>
                   </div>
                   <div>
-                    <a href="#" className="text-sm text-primary hover:underline dark:text-blue-400">
+                    <a
+                      href="#"
+                      className="text-sm text-primary hover:underline dark:text-blue-400"
+                    >
                       Forgot password?
                     </a>
                   </div>
@@ -212,7 +233,9 @@ const Auth = () => {
 
               <div className="relative flex items-center justify-center">
                 <div className="border-t border-border flex-grow dark:border-gray-700"></div>
-                <div className="px-3 text-xs text-muted-foreground dark:text-gray-500">or continue with</div>
+                <div className="px-3 text-xs text-muted-foreground dark:text-gray-500">
+                  or continue with
+                </div>
                 <div className="border-t border-border flex-grow dark:border-gray-700"></div>
               </div>
 
@@ -224,13 +247,13 @@ const Auth = () => {
                   <Github size={18} className="mr-2" />
                   GitHub
                 </button>
-                <button
-                  type="button"
+                <a
+                  href="http://localhost:5001/auth/google"
                   className="btn-ghost flex items-center justify-center dark:text-gray-300 dark:hover:bg-gray-800"
                 >
                   <Mail size={18} className="mr-2" />
                   Google
-                </button>
+                </a>
               </div>
             </form>
 
@@ -246,7 +269,9 @@ const Auth = () => {
 
             <div className="mt-6 text-center">
               <p className="text-sm dark:text-gray-300">
-                {isLogin ? "Don't have an account?" : "Already have an account?"}
+                {isLogin
+                  ? "Don't have an account?"
+                  : "Already have an account?"}
                 <button
                   type="button"
                   onClick={() => setIsLogin(!isLogin)}
