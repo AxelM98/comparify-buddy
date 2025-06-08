@@ -1,3 +1,4 @@
+
 import { toast } from "sonner";
 
 interface EbaySearchParams {
@@ -37,7 +38,7 @@ export const searchEbayProducts = async (
       keywords: params.keywords,
     });
 
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    const backendUrl = "https://comparify-buddy.lovable.app";
     const response = await fetch(
       `${backendUrl}/api/ebay-search?${query.toString()}`,
       {

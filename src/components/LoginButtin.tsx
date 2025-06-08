@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 
 const LoginButton = () => {
@@ -6,7 +7,7 @@ const LoginButton = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await fetch("http://localhost:5001/auth/user", {
+        const res = await fetch("https://comparify-buddy.lovable.app/auth/user", {
           credentials: "include",
         });
         if (res.ok) {
@@ -25,11 +26,11 @@ const LoginButton = () => {
   }, []);
 
   const handleLogin = () => {
-    window.location.href = "http://localhost:5001/auth/google";
+    window.location.href = "https://comparify-buddy.lovable.app/auth/google";
   };
 
   const handleLogout = () => {
-    window.location.href = "http://localhost:5001/auth/logout";
+    window.location.href = "https://comparify-buddy.lovable.app/auth/logout";
   };
 
   return (
