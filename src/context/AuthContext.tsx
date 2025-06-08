@@ -1,4 +1,3 @@
-
 import React, {
   createContext,
   useContext,
@@ -7,7 +6,7 @@ import React, {
   ReactNode,
 } from "react";
 
-const BACKEND_URL = "https://comparify-buddy.lovable.app";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5001";
 
 export interface User {
   _id: string;

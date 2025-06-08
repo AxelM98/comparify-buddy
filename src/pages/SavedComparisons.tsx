@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
@@ -43,7 +42,7 @@ const SavedComparisons = () => {
       try {
         if (user) {
           const res = await fetch(
-            "https://comparify-buddy.lovable.app/api/analysis",
+            `${import.meta.env.VITE_BACKEND_URL}/api/analysis`,
             {
               credentials: "include",
             }
@@ -74,7 +73,7 @@ const SavedComparisons = () => {
     if (user && analysisToDelete._id) {
       try {
         const res = await fetch(
-          `https://comparify-buddy.lovable.app/api/analysis/${
+          `${import.meta.env.VITE_BACKEND_URL}/api/analysis/${
             analysisToDelete._id
           }`,
           {
