@@ -6,6 +6,8 @@ import React, {
   ReactNode,
 } from "react";
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5001";
+
 export interface User {
   _id: string;
   email: string;
@@ -30,9 +32,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const fetchUser = async () => {
     try {
-      const res = await fetch("http://localhost:5001/auth/user", {
-        credentials: "include",
-      });
+      const res = await fetch(`${BACKEND_URL}/auth/user`, {
+  credentials: "include",
+});
 
       // Kontrollera att svaret är JSON
       const contentType = res.headers.get("content-type");
@@ -42,7 +44,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       const data = await res.json();
       if (data.user) {
-        console.log("✅ USER FROM SERVER:", data.user); // <-- lägg till denna logg
+        console.log("✅ USER FROM SERVER:", data.user);
         setUser(data.user);
       }
     } catch (err) {

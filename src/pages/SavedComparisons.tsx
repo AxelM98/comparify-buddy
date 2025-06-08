@@ -41,9 +41,12 @@ const SavedComparisons = () => {
     const fetchSavedComparisons = async () => {
       try {
         if (user) {
-          const res = await fetch("http://localhost:5001/api/analysis", {
-            credentials: "include",
-          });
+          const res = await fetch(
+            `${import.meta.env.VITE_BACKEND_URL}/api/analysis`,
+            {
+              credentials: "include",
+            }
+          );
           const data = await res.json();
           setComparisons(data);
           setIsEmpty(data.length === 0);
@@ -70,7 +73,9 @@ const SavedComparisons = () => {
     if (user && analysisToDelete._id) {
       try {
         const res = await fetch(
-          `http://localhost:5001/api/analysis/${analysisToDelete._id}`,
+          `${import.meta.env.VITE_BACKEND_URL}/api/analysis/${
+            analysisToDelete._id
+          }`,
           {
             method: "DELETE",
             credentials: "include",

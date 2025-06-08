@@ -23,7 +23,8 @@ router.get(
   }),
   (req, res) => {
     // Lyckad inloggning – skicka vidare till frontend
-    res.redirect("http://localhost:8080"); // Byt i production
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:8080";
+    res.redirect(frontendUrl);
   }
 );
 

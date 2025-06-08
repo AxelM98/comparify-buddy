@@ -26,10 +26,11 @@ const Navbar = () => {
   }, [location.pathname]);
 
   const handleLogout = async () => {
-    await fetch("http://localhost:5001/auth/logout", {
+    await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/logout`, {
       method: "GET",
       credentials: "include",
     });
+
     setUser(null);
     navigate("/");
   };

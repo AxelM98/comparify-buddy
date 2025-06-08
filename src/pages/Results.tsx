@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { ArrowLeft, Loader2, Zap, Save, Grid, List, Coins  } from "lucide-react";
+import { ArrowLeft, Loader2, Zap, Save, Grid, List, Coins } from "lucide-react";
 import ProductCard from "@/components/ProductCard";
 import {
   EbayProduct,
@@ -85,14 +85,17 @@ const Results = () => {
 
     if (user && user.email) {
       try {
-        const res = await fetch("http://localhost:5001/api/analysis/save", {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        });
+        const res = await fetch(
+          `${import.meta.env.VITE_BACKEND_URL}/api/analysis/save`,
+          {
+            method: "POST",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+          }
+        );
 
         if (!res.ok) throw new Error("Failed to save");
 
@@ -102,7 +105,9 @@ const Results = () => {
         toast.error("❌ Could not save to your account");
       }
     } else {
-      const saved = JSON.parse(localStorage.getItem("savedComparisons") || "[]");
+      const saved = JSON.parse(
+        localStorage.getItem("savedComparisons") || "[]"
+      );
       saved.push(payload.analysis);
       localStorage.setItem("savedComparisons", JSON.stringify(saved));
       toast.success("💾 Saved locally");
@@ -162,7 +167,8 @@ const Results = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               <div className="rounded-xl border-2 border-primary shadow p-6 bg-secondary/30 h-48 flex flex-col justify-center items-center">
                 <h3 className="text-lg font-medium mb-2 flex items-center">
-                  <Zap size={20} className="mr-2 text-primary" /> Suggested Price:
+                  <Zap size={20} className="mr-2 text-primary" /> Suggested
+                  Price:
                 </h3>
                 <p className="text-4xl font-bold text-primary">
                   ${metrics.suggestion.toFixed(2)}
@@ -170,7 +176,8 @@ const Results = () => {
               </div>
               <div className="rounded-xl border-2 border-muted shadow p-6 h-50 flex flex-col justify-center items-center">
                 <h3 className="text-lg font-medium mb-2 flex items-center">
-                  <Coins  size={20} className="mr-2 text-primary" /> Your Price ($)
+                  <Coins size={20} className="mr-2 text-primary" /> Your Price
+                  ($)
                 </h3>
                 <input
                   type="number"
@@ -183,21 +190,47 @@ const Results = () => {
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-              <Stat label="Average Price" value={`$${metrics.average.toFixed(2)}`} />
-              <Stat label="Median Price" value={`$${metrics.median.toFixed(2)}`} />
-              <Stat label="Lowest Price" value={`$${metrics.lowest.toFixed(2)}`} />
-              <Stat label="Highest Price" value={`$${metrics.highest.toFixed(2)}`} />
+              <Stat
+                label="Average Price"
+                value={`$${metrics.average.toFixed(2)}`}
+              />
+              <Stat
+                label="Median Price"
+                value={`$${metrics.median.toFixed(2)}`}
+              />
+              <Stat
+                label="Lowest Price"
+                value={`$${metrics.lowest.toFixed(2)}`}
+              />
+              <Stat
+                label="Highest Price"
+                value={`$${metrics.highest.toFixed(2)}`}
+              />
             </div>
 
             <div className="space-y-5 text-base text-muted-foreground mb-8">
               <p>
-                <strong>Rationale:</strong> The average selling price on eBay for similar products is
-                <span className="text-foreground font-medium"> ${metrics.average.toFixed(2)}</span>, while prices vary widely between
-                <span className="text-foreground font-medium"> ${metrics.lowest.toFixed(2)}</span> and
-                <span className="text-foreground font-medium"> ${metrics.highest.toFixed(2)}</span>.
+                <strong>Rationale:</strong> The average selling price on eBay
+                for similar products is
+                <span className="text-foreground font-medium">
+                  {" "}
+                  ${metrics.average.toFixed(2)}
+                </span>
+                , while prices vary widely between
+                <span className="text-foreground font-medium">
+                  {" "}
+                  ${metrics.lowest.toFixed(2)}
+                </span>{" "}
+                and
+                <span className="text-foreground font-medium">
+                  {" "}
+                  ${metrics.highest.toFixed(2)}
+                </span>
+                .
               </p>
               <p>
-                <strong>Alternative Strategy:</strong> {metrics.suggestion < metrics.average
+                <strong>Alternative Strategy:</strong>{" "}
+                {metrics.suggestion < metrics.average
                   ? "Emphasize your competitive pricing in listings to attract more buyers."
                   : "If pricing higher, consider bundling or offering fast/free shipping to justify the value."}
               </p>

@@ -248,7 +248,7 @@ const Auth = () => {
                   GitHub
                 </button>
                 <a
-                  href="http://localhost:5001/auth/google"
+                  href={`${import.meta.env.VITE_BACKEND_URL}/auth/google`}
                   className="btn-ghost flex items-center justify-center dark:text-gray-300 dark:hover:bg-gray-800"
                 >
                   <Mail size={18} className="mr-2" />
