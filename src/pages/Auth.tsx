@@ -61,6 +61,8 @@ const Auth = () => {
       window.location.href = "/";
     }, 1000);
   };
+  
+  console.log("VITE_BACKEND_URL =", import.meta.env.VITE_BACKEND_URL)
 
   return (
     <div className="min-h-screen flex items-center justify-center pt-12 pb-20 px-4 sm:px-6 lg:px-8 dark:bg-gray-950">

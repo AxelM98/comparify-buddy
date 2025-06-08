@@ -1,4 +1,3 @@
-
 import { toast } from "sonner";
 
 interface EbaySearchParams {
@@ -38,7 +37,13 @@ export const searchEbayProducts = async (
       keywords: params.keywords,
     });
 
-    const response = await fetch(`/api/ebay-search?${query.toString()}`);
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    const response = await fetch(
+      `${backendUrl}/api/ebay-search?${query.toString()}`,
+      {
+        credentials: "include",
+      }
+    );
 
     if (!response.ok) {
       throw new Error(`eBay Proxy API error: ${response.status}`);
@@ -54,7 +59,6 @@ export const searchEbayProducts = async (
     return getMockProducts(params.keywords);
   }
 };
-
 
 const transformBrowseApiResponse = (data: any): EbayProduct[] => {
   if (!data || !data.itemSummaries) {
@@ -92,7 +96,7 @@ const getMockProducts = (keywords: string): EbayProduct[] => {
   // Generate a random number of results between 3 and 10
   const count = Math.floor(Math.random() * 8) + 3;
   const products: EbayProduct[] = [];
-  
+
   // Product image URLs for development
   const imageUrls = [
     "https://images.unsplash.com/photo-1542291026-7eec264c27ff",
@@ -101,12 +105,14 @@ const getMockProducts = (keywords: string): EbayProduct[] => {
     "https://images.unsplash.com/photo-1600185365483-26d7a4cc7519",
     "https://images.unsplash.com/photo-1491553895911-0055eca6402d",
   ];
-  
+
   for (let i = 0; i < count; i++) {
     const price = (Math.random() * 100 + 50).toFixed(2);
-    const marketPrice = (Number(price) * (Math.random() * 0.4 + 0.8)).toFixed(2);
+    const marketPrice = (Number(price) * (Math.random() * 0.4 + 0.8)).toFixed(
+      2
+    );
     const sold = Math.floor(Math.random() * 200) + 10;
-    
+
     products.push({
       id: `sp${i + 1}`,
       title: `${keywords} - Product ${i + 1} (Similar Item)`,
@@ -119,7 +125,7 @@ const getMockProducts = (keywords: string): EbayProduct[] => {
       source: "eBay",
     });
   }
-  
+
   return products;
 };
 
@@ -143,7 +149,7 @@ export const calculatePricingRecommendation = (
 
   // Extract all prices
   const prices = products.map((p) => p.currentPrice || 0).filter((p) => p > 0);
-  
+
   if (!prices.length) {
     return {
       yourPrice: currentPrice || 0,
@@ -157,13 +163,13 @@ export const calculatePricingRecommendation = (
 
   // Sort prices for median calculation
   prices.sort((a, b) => a - b);
-  
+
   // Calculate statistics
   const lowest = prices[0];
   const highest = prices[prices.length - 1];
   const sum = prices.reduce((a, b) => a + b, 0);
   const average = sum / prices.length;
-  
+
   // Calculate median
   let median;
   const mid = Math.floor(prices.length / 2);
@@ -172,7 +178,7 @@ export const calculatePricingRecommendation = (
   } else {
     median = prices[mid];
   }
-  
+
   // Calculate suggested price (slightly below average but above lowest)
   const suggestion = Math.max(
     lowest * 1.05,
