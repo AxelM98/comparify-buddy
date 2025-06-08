@@ -56,6 +56,8 @@
     "lucide-react": "^0.462.0",
     "mongoose": "^8.15.1",
     "next-themes": "^0.3.0",
+    "node-fetch": "^3.3.2",
+    "papaparse": "^5.5.3",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "react": "^18.3.1",

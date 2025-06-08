@@ -181,7 +181,7 @@ const SavedComparisons = () => {
                 >
                   <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
                     <div className="mb-4 lg:mb-0">
-                      <h2 className="text-xl font-medium mb-2">
+                      <h2 className="text-xl font-medium mb-2 capitalize">
                         {getMainProductName(comparison)}
                       </h2>
                       <div className="flex flex-wrap items-center text-sm text-muted-foreground">

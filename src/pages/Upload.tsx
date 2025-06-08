@@ -14,6 +14,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { searchEbayProducts } from "@/services/ebayService";
+import Papa from "papaparse"; 
 
 interface ProductInput {
   name: string;
@@ -110,15 +111,42 @@ const UploadPage = () => {
   };
 
   const handleFileUpload = (file: File) => {
-    setFileName(file.name);
-    toast("File uploaded", {
-      description: `${file.name} has been uploaded`,
-    });
+  setFileName(file.name);
 
-    setTimeout(() => {
-      setProducts([...demoProducts]);
-    }, 1000);
-  };
+  Papa.parse(file, {
+    header: true,
+    skipEmptyLines: true,
+    complete: function (results) {
+      const parsedData = results.data as any[];
+
+      const products = parsedData
+        .map((row) => {
+          const name = (row.name || "").trim();
+          if (!name) return null;
+
+          return {
+            name,
+            price: (row.price || "").toString().trim(),
+            sku: (row.sku || "").toString().trim(),
+            description: (row.description || "").toString().trim(),
+          };
+        })
+        .filter(Boolean); // tar bort null-värden
+
+      if (products.length === 0) {
+        toast.error("No valid products found in the file.");
+        return;
+      }
+
+      setProducts(products);
+      toast.success(`${products.length} products loaded from file`);
+    },
+    error: function (error) {
+      console.error("CSV parse error:", error);
+      toast.error("Failed to read CSV file.");
+    },
+  });
+};
 
   const handleSubmit = async () => {
     if (products.length === 0) {
@@ -290,13 +318,13 @@ const UploadPage = () => {
                           Product Name
                         </th>
                         <th className="py-3 px-4 text-left font-medium text-sm">
-                          Price
+                          Price <span className="text-muted-foreground">(Your product)</span>
                         </th>
                         <th className="py-3 px-4 text-left font-medium text-sm">
-                          SKU/EAN
+                          SKU/EAN <span className="text-muted-foreground">(Your product)</span>
                         </th>
                         <th className="py-3 px-4 text-left font-medium text-sm">
-                          Description
+                          Description <span className="text-muted-foreground">(Your product)</span>
                         </th>
                         <th className="py-3 px-4 text-left font-medium text-sm w-10"></th>
                       </tr>
