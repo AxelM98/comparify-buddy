@@ -61,8 +61,8 @@ const Auth = () => {
       window.location.href = "/";
     }, 1000);
   };
-  
-  console.log("VITE_BACKEND_URL =", import.meta.env.VITE_BACKEND_URL)
+
+  console.log("VITE_BACKEND_URL =", import.meta.env.VITE_BACKEND_URL);
 
   return (
     <div className="min-h-screen flex items-center justify-center pt-12 pb-20 px-4 sm:px-6 lg:px-8 dark:bg-gray-950">
@@ -250,8 +250,8 @@ const Auth = () => {
                   GitHub
                 </button>
                 <a
-                  href={`${import.meta.env.VITE_BACKEND_URL}/auth/google`}
-                  className="btn-ghost flex items-center justify-center dark:text-gray-300 dark:hover:bg-gray-800"
+                  href="https://comparify-buddy.lovable.app/auth/google"
+                  className="btn-ghost flex items-center justify-center ..."
                 >
                   <Mail size={18} className="mr-2" />
                   Google
