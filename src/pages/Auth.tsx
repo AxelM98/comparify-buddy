@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
@@ -61,6 +60,11 @@ const Auth = () => {
       // Redirect to home page
       window.location.href = "/";
     }, 1000);
+  };
+
+  const handleGoogleLogin = () => {
+    console.log("🔗 Redirecting to Google OAuth...");
+    window.location.href = "https://comparify-buddy.lovable.app/auth/google";
   };
 
   return (
@@ -248,13 +252,14 @@ const Auth = () => {
                   <Github size={18} className="mr-2" />
                   GitHub
                 </button>
-                <a
-                  href="https://comparify-buddy.lovable.app/auth/google"
+                <button
+                  type="button"
+                  onClick={handleGoogleLogin}
                   className="btn-ghost flex items-center justify-center dark:text-gray-300 dark:hover:bg-gray-800"
                 >
                   <Mail size={18} className="mr-2" />
                   Google
-                </a>
+                </button>
               </div>
             </form>
 

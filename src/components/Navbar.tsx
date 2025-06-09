@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -27,13 +26,24 @@ const Navbar = () => {
   }, [location.pathname]);
 
   const handleLogout = async () => {
-    await fetch("https://comparify-buddy.lovable.app/auth/logout", {
-      method: "GET",
-      credentials: "include",
-    });
+    try {
+      console.log("🔗 Navbar logout request...");
+      
+      await fetch("https://comparify-buddy.lovable.app/auth/logout", {
+        method: "GET",
+        credentials: "include",
+        mode: "cors",
+      });
 
-    setUser(null);
-    navigate("/");
+      setUser(null);
+      navigate("/");
+      console.log("✅ Logout successful");
+    } catch (error) {
+      console.error("❌ Logout error:", error);
+      // Still clear user state even if request fails
+      setUser(null);
+      navigate("/");
+    }
   };
 
   const navLinks = [

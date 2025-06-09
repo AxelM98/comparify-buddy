@@ -3,21 +3,34 @@ import React, { useEffect, useState } from "react";
 
 const LoginButton = () => {
   const [user, setUser] = useState(null);
+  const BACKEND_URL = "https://comparify-buddy.lovable.app";
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await fetch("https://comparify-buddy.lovable.app/auth/user", {
+        console.log("🔍 LoginButton checking auth...");
+        
+        const res = await fetch(`${BACKEND_URL}/auth/user`, {
           credentials: "include",
+          mode: "cors",
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+          },
         });
+        
+        console.log("📡 LoginButton auth response:", res.status);
+        
         if (res.ok) {
           const data = await res.json();
           setUser(data.user || null);
+          console.log("✅ LoginButton user:", data.user);
         } else {
           setUser(null);
+          console.log("❌ LoginButton auth failed:", res.status);
         }
       } catch (err) {
-        console.error("Auth check failed", err);
+        console.error("❌ LoginButton auth check failed", err);
         setUser(null);
       }
     };
@@ -26,11 +39,13 @@ const LoginButton = () => {
   }, []);
 
   const handleLogin = () => {
-    window.location.href = "https://comparify-buddy.lovable.app/auth/google";
+    console.log("🔗 Redirecting to Google login...");
+    window.location.href = `${BACKEND_URL}/auth/google`;
   };
 
   const handleLogout = () => {
-    window.location.href = "https://comparify-buddy.lovable.app/auth/logout";
+    console.log("🔗 Redirecting to logout...");
+    window.location.href = `${BACKEND_URL}/auth/logout`;
   };
 
   return (

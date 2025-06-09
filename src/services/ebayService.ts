@@ -39,15 +39,25 @@ export const searchEbayProducts = async (
 
     const backendUrl = "https://comparify-buddy.lovable.app";
 
+    console.log("📡 Making eBay API request to:", `${backendUrl}/api/ebay-search?${query.toString()}`);
+
     const response = await fetch(
       `${backendUrl}/api/ebay-search?${query.toString()}`,
       {
         credentials: "include",
+        mode: "cors",
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+        },
       }
     );
 
+    console.log("📡 eBay API response status:", response.status);
+    console.log("📡 eBay API response headers:", response.headers);
+
     if (!response.ok) {
-      throw new Error(`eBay Proxy API error: ${response.status}`);
+      throw new Error(`eBay Proxy API error: ${response.status} - ${response.statusText}`);
     }
 
     const data = await response.json();

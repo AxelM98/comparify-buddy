@@ -33,13 +33,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const fetchUser = async () => {
     try {
+      console.log("🔍 Fetching user from:", `${BACKEND_URL}/auth/user`);
+      
       const res = await fetch(`${BACKEND_URL}/auth/user`, {
-  credentials: "include",
-});
+        credentials: "include",
+        mode: "cors",
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+        },
+      });
+
+      console.log("📡 Response status:", res.status);
+      console.log("📡 Response headers:", res.headers);
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
 
       // Kontrollera att svaret är JSON
       const contentType = res.headers.get("content-type");
       if (!contentType?.includes("application/json")) {
+        console.log("❌ Response is not JSON:", contentType);
         throw new Error("Not JSON response");
       }
 
@@ -47,9 +62,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (data.user) {
         console.log("✅ USER FROM SERVER:", data.user);
         setUser(data.user);
+      } else {
+        console.log("❌ No user in response:", data);
       }
     } catch (err) {
-      console.error("No user session", err);
+      console.error("❌ Auth fetch error:", err);
     }
   };
 
