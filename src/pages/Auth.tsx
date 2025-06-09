@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
@@ -61,8 +62,6 @@ const Auth = () => {
       window.location.href = "/";
     }, 1000);
   };
-
-  console.log("VITE_BACKEND_URL =", import.meta.env.VITE_BACKEND_URL);
 
   return (
     <div className="min-h-screen flex items-center justify-center pt-12 pb-20 px-4 sm:px-6 lg:px-8 dark:bg-gray-950">
@@ -251,7 +250,7 @@ const Auth = () => {
                 </button>
                 <a
                   href="https://comparify-buddy.lovable.app/auth/google"
-                  className="btn-ghost flex items-center justify-center ..."
+                  className="btn-ghost flex items-center justify-center dark:text-gray-300 dark:hover:bg-gray-800"
                 >
                   <Mail size={18} className="mr-2" />
                   Google

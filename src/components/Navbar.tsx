@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -26,7 +27,7 @@ const Navbar = () => {
   }, [location.pathname]);
 
   const handleLogout = async () => {
-    await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/logout`, {
+    await fetch("https://comparify-buddy.lovable.app/auth/logout", {
       method: "GET",
       credentials: "include",
     });
