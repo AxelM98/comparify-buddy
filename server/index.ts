@@ -1,4 +1,4 @@
-import express, { Request, Response, RequestHandler } from "express";
+import express, { Request, Response } from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import session from "express-session";
@@ -16,11 +16,20 @@ dotenv.config();
 const app = express();
 
 // Middlewares
-const allowedOrigin = process.env.FRONTEND_URL || "http://localhost:8080";
+const allowedOrigins = [
+  "http://localhost:8080",
+  "https://comparify-buddy.lovable.app",
+];
 
 app.use(
   cors({
-    origin: allowedOrigin,
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
@@ -47,7 +56,7 @@ app.use("/auth", authRoutes);
 app.use("/api/analysis", analysisRoutes);
 
 // eBay Proxy Handler
-const ebaySearchHandler: RequestHandler = async (req, res) => {
+const ebaySearchHandler = async (req: Request, res: Response): Promise<void> => {
   const { keywords } = req.query;
 
   if (!keywords || typeof keywords !== "string") {
@@ -76,7 +85,15 @@ const ebaySearchHandler: RequestHandler = async (req, res) => {
     );
 
     const tokenData = await tokenRes.json();
-    const token = tokenData.access_token;
+    console.log("🔑 Token response:", tokenData);
+
+    const token = (tokenData as any).access_token;
+
+    if (!token) {
+      console.error("❌ No access_token found in tokenData", tokenData);
+      res.status(500).json({ error: "eBay token fetch failed" });
+      return;
+    }
 
     const ebayRes = await fetch(
       `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodeURIComponent(
@@ -92,11 +109,9 @@ const ebaySearchHandler: RequestHandler = async (req, res) => {
 
     const data = await ebayRes.json();
     res.status(200).json(data);
-    return;
   } catch (error) {
     console.error("eBay proxy error:", error);
     res.status(500).json({ error: "Internal server error" });
-    return;
   }
 };
 
