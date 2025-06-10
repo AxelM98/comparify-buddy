@@ -5,6 +5,7 @@ import { Github, Mail, Eye, EyeOff, ArrowRight, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const Auth = () => {
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5001";
   const { toast } = useToast();
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
@@ -64,7 +65,7 @@ const Auth = () => {
 
   const handleGoogleLogin = () => {
     console.log("🔗 Redirecting to Google OAuth...");
-    window.location.href = "https://comparify-buddy.lovable.app/auth/google";
+    window.location.href = `${BACKEND_URL}/auth/google`;
   };
 
   return (

@@ -12,6 +12,9 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { user, setUser } = useAuth();
 
+  const BACKEND_URL =
+    import.meta.env.VITE_BACKEND_URL || "http://localhost:5001";
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
@@ -28,8 +31,8 @@ const Navbar = () => {
   const handleLogout = async () => {
     try {
       console.log("🔗 Navbar logout request...");
-      
-      await fetch("https://comparify-buddy.lovable.app/auth/logout", {
+
+      await fetch(`${BACKEND_URL}/auth/logout`, {
         method: "GET",
         credentials: "include",
         mode: "cors",

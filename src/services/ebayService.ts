@@ -37,9 +37,15 @@ export const searchEbayProducts = async (
       keywords: params.keywords,
     });
 
-    const backendUrl = "https://comparify-buddy.lovable.app";
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    if (!backendUrl) {
+      throw new Error("❌ VITE_BACKEND_URL is not defined in production");
+    }
 
-    console.log("📡 Making eBay API request to:", `${backendUrl}/api/ebay-search?${query.toString()}`);
+    console.log(
+      "📡 Making eBay API request to:",
+      `${backendUrl}/api/ebay-search?${query.toString()}`
+    );
 
     const response = await fetch(
       `${backendUrl}/api/ebay-search?${query.toString()}`,
@@ -47,7 +53,7 @@ export const searchEbayProducts = async (
         credentials: "include",
         mode: "cors",
         headers: {
-          "Accept": "application/json",
+          Accept: "application/json",
           "Content-Type": "application/json",
         },
       }
@@ -57,7 +63,9 @@ export const searchEbayProducts = async (
     console.log("📡 eBay API response headers:", response.headers);
 
     if (!response.ok) {
-      throw new Error(`eBay Proxy API error: ${response.status} - ${response.statusText}`);
+      throw new Error(
+        `eBay Proxy API error: ${response.status} - ${response.statusText}`
+      );
     }
 
     const data = await response.json();

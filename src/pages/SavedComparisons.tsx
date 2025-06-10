@@ -1,3 +1,4 @@
+// TODO: Implement export (PDF/CSV) for user analysis
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
@@ -33,6 +34,7 @@ interface Comparison {
 }
 
 const SavedComparisons = () => {
+  const baseUrl = import.meta.env.VITE_BACKEND_URL;
   const [comparisons, setComparisons] = useState<Comparison[]>([]);
   const [isEmpty, setIsEmpty] = useState(false);
   const { user } = useAuth();
@@ -41,12 +43,9 @@ const SavedComparisons = () => {
     const fetchSavedComparisons = async () => {
       try {
         if (user) {
-          const res = await fetch(
-            "https://comparify-buddy.lovable.app/api/analysis",
-            {
-              credentials: "include",
-            }
-          );
+          const res = await fetch(`${baseUrl}/api/analysis`, {
+            credentials: "include",
+          });
           const data = await res.json();
           setComparisons(data);
           setIsEmpty(data.length === 0);
@@ -73,13 +72,8 @@ const SavedComparisons = () => {
     if (user && analysisToDelete._id) {
       try {
         const res = await fetch(
-          `https://comparify-buddy.lovable.app/api/analysis/${
-            analysisToDelete._id
-          }`,
-          {
-            method: "DELETE",
-            credentials: "include",
-          }
+          `${baseUrl}/api/analysis/${analysisToDelete._id}`,
+          { method: "DELETE", credentials: "include" }
         );
 
         if (!res.ok) throw new Error("Delete failed");

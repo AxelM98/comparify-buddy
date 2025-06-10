@@ -20,6 +20,8 @@ import Navbar from "./components/Navbar";
 
 const queryClient = new QueryClient();
 
+console.log("🌍 VITE_BACKEND_URL:", import.meta.env.VITE_BACKEND_URL);
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>

@@ -1,4 +1,3 @@
-
 import React from "react";
 import { ArrowUpDown, ExternalLink, Share2 } from "lucide-react";
 
@@ -34,11 +33,15 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
   // Safely calculate price differences with null checks
   const priceDifference = marketPrice != null ? marketPrice - price : 0;
-  const percentageDiff = marketPrice != null ? (priceDifference / marketPrice) * 100 : 0;
+  const percentageDiff =
+    marketPrice != null ? (priceDifference / marketPrice) * 100 : 0;
   const isPriceHigher = priceDifference < 0;
 
   // Helper function to safely format numbers
-  const safeToFixed = (value: number | null | undefined, digits: number = 2): string => {
+  const safeToFixed = (
+    value: number | null | undefined,
+    digits: number = 2
+  ): string => {
     if (value == null) return "0.00";
     return value.toFixed(digits);
   };
@@ -57,7 +60,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             <span className="text-muted-foreground">No image</span>
           </div>
         )}
-        
+
         {isComparison && (
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3">
             <div className="flex items-center justify-between">
@@ -113,7 +116,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                   </span>
                 )}
               </div>
-              
+
               {isComparison && (
                 <div className="text-xs text-muted-foreground flex items-center mt-1">
                   <span className="mr-2">★ {safeToFixed(rating, 1)}</span>
@@ -121,7 +124,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 </div>
               )}
             </div>
-            
+
             {!isComparison && (
               <button className="text-xs bg-primary/10 hover:bg-primary/20 text-primary px-2.5 py-1 rounded-lg transition-colors duration-200">
                 Compare
