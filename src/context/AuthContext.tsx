@@ -36,7 +36,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       const res = await fetch(`${BACKEND_URL}/auth/user`, {
         credentials: "include",
-        mode: "cors",
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
