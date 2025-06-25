@@ -174,16 +174,22 @@ const Results = () => {
               </div>
               <div className="rounded-xl border-2 border-muted shadow p-6 h-50 flex flex-col justify-center items-center">
                 <h3 className="text-lg font-medium mb-2 flex items-center">
-                  <Coins size={20} className="mr-2 text-primary" /> Your Price
-                  ($)
+                  <Coins size={20} className="mr-2 text-primary" /> Your Price:
                 </h3>
-                <input
-                  type="number"
-                  step="0.01"
-                  value={product.price}
-                  onChange={(e) => handlePriceChange(index, e.target.value)}
-                  className="text-4xl font-bold text-center w-full max-w-xs px-4 py-3 rounded-lg outline-none bg-transparent [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-moz-appearance]:textfield"
-                />
+                <div className="flex items-center">
+                  <p className="text-4xl font-bold">$</p>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={product.price}
+                    onChange={(e) => handlePriceChange(index, e.target.value)}
+                    className="text-4xl font-bold text-center rounded-lg outline-none bg-transparent 
+                  [&::-webkit-outer-spin-button]:appearance-none 
+                  [&::-webkit-inner-spin-button]:appearance-none 
+                  [&::-moz-appearance]:textfield"
+                    style={{ width: `${String(product.price).length + 0.2}ch` }}
+                  />
+                </div>
               </div>
             </div>
 
@@ -287,6 +293,7 @@ const Results = () => {
                         source: p.source,
                       }}
                       isComparison={true}
+                      viewMode={viewMode}
                     />
                   </motion.div>
                 ))}

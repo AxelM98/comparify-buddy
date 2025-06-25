@@ -34,7 +34,7 @@ const Index = () => {
                 Upload Products
                 <ArrowRight size={16} className="ml-2" />
               </Link>
-              <Link to="/auth" className="btn-secondary flex items-center">
+              <Link to="/upload" className="btn-secondary flex items-center">
                 <Zap size={18} className="mr-2" />
                 Try Demo
               </Link>

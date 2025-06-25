@@ -14,11 +14,13 @@ interface ProductCardProps {
     source?: string;
   };
   isComparison?: boolean;
+  viewMode?: "grid" | "list";
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
   product,
   isComparison = false,
+  viewMode = "grid",
 }) => {
   const {
     name,
@@ -47,16 +49,26 @@ const ProductCard: React.FC<ProductCardProps> = ({
   };
 
   return (
-    <div className="glass-card overflow-hidden flex flex-col animate-scale-in">
+    <div
+      className={`glass-card overflow-hidden animate-scale-in ${
+        viewMode === "list" ? "flex flex-row h-48" : "flex flex-col"
+      }`}
+    >
       <div className="relative overflow-hidden group">
         {image ? (
           <img
             src={image}
             alt={name}
-            className="w-full h-48 object-cover object-center transition-transform duration-500 group-hover:scale-105"
+            className={`object-cover object-center transition-transform duration-500 group-hover:scale-105 ${
+              viewMode === "list" ? "w-48 h-full" : "w-full h-48"
+            }`}
           />
         ) : (
-          <div className="w-full h-48 bg-secondary flex items-center justify-center">
+          <div
+            className={`bg-secondary flex items-center justify-center ${
+              viewMode === "list" ? "w-48 h-full" : "w-full h-48"
+            }`}
+          >
             <span className="text-muted-foreground">No image</span>
           </div>
         )}
